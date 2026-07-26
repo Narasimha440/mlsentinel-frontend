@@ -1,0 +1,17 @@
+@import url("https://fonts.cdnfonts.com/css/satoshi");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+    --font-sans: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --color-ink: #111827;
+    --color-accent: #2563ed;
+    --color-accent-dark: #1d4ed8;
+    --color-line: #ececec;
+}
+
+body {
+    @apply bg-white font-sans text-ink antialiased;
+    font-weight: 700;
+}
