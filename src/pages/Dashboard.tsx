@@ -1,32 +1,37 @@
 import { useAuth } from "../context/AuthContext";
 import { signOut } from "firebase/auth";
+import { Sidebar } from "../components/dashboard/Sidebar";
 import { auth } from "../lib/firebase";
 import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Activity, ArrowUpRight, Bell, ChevronRight, CircleAlert, Clock3, LogOut, Plus, ShieldCheck } from "lucide-react";
+import { Activity, ArrowUpRight, Bell, ChevronRight, CircleAlert, LogOut, Plus, ShieldCheck } from "lucide-react";
 import { SPRING } from "../lib/motion";
 
 type Status = "Healthy" | "Warning" | "Critical";
 
-type Model = {
-  name: string;
-  version: string;
-  accuracy: string;
-  latency: string;
-  status: Status;
-};
-
-const models: Model[] = [
-  { name: "Fraud detection", version: "v2.4.1", accuracy: "96.8%", latency: "42 ms", status: "Healthy" },
-  { name: "Demand forecasting", version: "v1.8.0", accuracy: "91.2%", latency: "68 ms", status: "Warning" },
-  { name: "Document classifier", version: "v3.1.2", accuracy: "98.4%", latency: "31 ms", status: "Healthy" },
-];
-
-const activity = [
-  { title: "Fraud detection completed a health check", time: "2 minutes ago", status: "Healthy" as Status },
-  { title: "Feature drift detected in demand forecasting", time: "18 minutes ago", status: "Warning" as Status },
-  { title: "Document classifier was deployed", time: "1 hour ago", status: "Healthy" as Status },
-];
+interface DashboardData {
+  summary: {
+    overall_health_score: number | null;
+    active_models: number;
+    healthy_models: number;
+    warning_models: number;
+    critical_models: number;
+  };
+  health_trend: { date: string; health_score: number }[];
+  model_performance: {
+    model_id: number;
+    project: string;
+    name: string;
+    health_score: number;
+    metrics: Record<string, number>;
+    status: Status;
+    last_updated: string;
+  }[];
+  findings: { model: string; issue: string; severity: string; detected_at: string }[];
+  recommendations: { model: string; recommendation: string; severity: string }[];
+  recent_reports: { project: string; model: string; health_score: number; issues: number; timestamp: string }[];
+}
 
 const statusClass: Record<Status, string> = {
   Healthy: "border-green-200 bg-green-50 text-green-700",
@@ -46,126 +51,167 @@ const enter = (delay: number) => ({
   transition: { ...SPRING, delay },
 });
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+
 export default function Dashboard() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchDashboard = async () => {
+      try {
+        const token = await user.getIdToken();
+        const res = await fetch(`${API_BASE}/api/dashboard`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        const json = await res.json();
+        setData(json);
+      } catch (err) {
+        setError("Couldn't load dashboard data. Please try again.");
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchDashboard();
+  }, [user]);
 
   const handleLogout = async () => {
     await signOut(auth);
     navigate("/");
   };
 
-  if (isLoading) {
+  if (isLoading || loadingData) {
     return <main className="flex min-h-screen items-center justify-center bg-white text-sm text-gray-500">Loading dashboard…</main>;
+  }
+
+  if (error) {
+    return <main className="flex min-h-screen items-center justify-center bg-white text-sm text-red-500">{error}</main>;
   }
 
   const displayName = user?.displayName?.split(" ")[0] || "there";
   const initials = user?.displayName?.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase() || "MS";
 
+  const summary = data?.summary;
+  const hasModels = (summary?.active_models ?? 0) > 0;
+
   return (
-    <main className="min-h-screen bg-white text-gray-900">
-      <header className="border-b border-gray-200">
-        <div className="mx-auto flex h-20 max-w-[1280px] items-center justify-between px-6 sm:px-8">
-          <a href="/" className="text-[19px] font-medium tracking-tight text-ink">MLSentinel</a>
-          <div className="flex items-center gap-3">
-            <button type="button" aria-label="Notifications" className="grid h-10 w-10 place-items-center rounded-full border border-gray-200 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-600/10">
-              <Bell className="h-4 w-4" />
-            </button>
-            <div className="hidden items-center gap-3 sm:flex">
-              <span className="grid h-10 w-10 place-items-center rounded-full bg-blue-50 text-sm font-medium text-blue-600">{initials}</span>
-              <div className="leading-tight">
-                <p className="text-sm font-medium text-gray-900">{user?.displayName || "MLSentinel user"}</p>
-                <p className="mt-1 text-xs text-gray-500">{user?.email}</p>
-              </div>
-            </div>
-            <button type="button" onClick={handleLogout} className="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-600/10" aria-label="Log out">
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Log out</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-[1280px] px-6 py-12 sm:px-8 lg:py-16">
-        <motion.section {...enter(0)} className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-          <div>
-            <p className="text-sm font-medium text-blue-600">Production overview</p>
-            <h1 className="mt-3 text-4xl font-medium tracking-tight text-gray-900 sm:text-5xl">Good morning, {displayName}.</h1>
-            <p className="mt-4 text-base leading-relaxed text-gray-600">Your production models are being monitored continuously.</p>
-          </div>
-          <button type="button" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gray-900 px-5 text-sm font-medium text-white transition-colors hover:bg-black focus:outline-none focus:ring-4 focus:ring-gray-900/20">
-            <Plus className="h-4 w-4" />
-            Add model
-          </button>
-        </motion.section>
-
-        <section aria-label="Monitoring summary" className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <SummaryCard delay={0.05} label="Models monitored" value="12" detail="3 added this month" icon={<Activity className="h-4 w-4" />} />
-          <SummaryCard delay={0.1} label="Average health" value="94.6%" detail="Up 1.8% this week" icon={<ShieldCheck className="h-4 w-4" />} tone="text-green-600" />
-          <SummaryCard delay={0.15} label="Open alerts" value="2" detail="1 needs attention" icon={<CircleAlert className="h-4 w-4" />} tone="text-amber-600" />
-          <SummaryCard delay={0.2} label="Predictions today" value="48.2k" detail="Across all production models" icon={<Clock3 className="h-4 w-4" />} />
-        </section>
-
-        <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.85fr)]">
-          <motion.section {...enter(0.25)} className="rounded-xl border border-gray-200 bg-white p-6 sm:p-8" aria-labelledby="health-heading">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-blue-600">System health</p>
-                <h2 id="health-heading" className="mt-2 text-2xl font-medium tracking-tight text-gray-900">Healthy across production</h2>
-              </div>
-              <StatusBadge status="Healthy" />
-            </div>
-            <div className="mt-8 grid gap-8 md:grid-cols-[minmax(0,1fr)_180px] md:items-end">
-              <HealthChart />
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
-                <Metric label="Accuracy" value="94.6%" />
-                <Metric label="Latency" value="38 ms" />
-                <Metric label="Data drift" value="Low" />
-              </div>
-            </div>
-          </motion.section>
-
-          <motion.section {...enter(0.3)} className="rounded-xl border border-gray-200 bg-white p-6 sm:p-8" aria-labelledby="activity-heading">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-600">Recent activity</p>
-                <h2 id="activity-heading" className="mt-2 text-2xl font-medium tracking-tight text-gray-900">What changed</h2>
-              </div>
-              <button type="button" aria-label="View all activity" className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-600/10"><ArrowUpRight className="h-4 w-4" /></button>
-            </div>
-            <ol className="mt-7 divide-y divide-gray-100">
-              {activity.map((item) => (
-                <li key={item.title} className="flex gap-3 py-4 first:pt-0 last:pb-0">
-                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${statusDot[item.status]}`} aria-hidden="true" />
-                  <div>
-                    <p className="text-sm leading-5 text-gray-800">{item.title}</p>
-                    <p className="mt-1 text-xs text-gray-500">{item.time}</p>
+    <div className="min-h-screen bg-white">
+      <Sidebar
+        userName={user?.displayName || "MLSentinel user"}
+        userEmail={user?.email || ""}
+        userPhotoUrl={user?.photoURL || undefined}
+      />
+      <main className="ml-64 min-h-screen bg-white">
+          <header className="border-b border-gray-200">
+            <div className="mx-auto flex h-20 max-w-[1280px] items-center justify-between px-6 sm:px-8">
+              <a href="/" className="text-[19px] font-medium tracking-tight text-ink">MLSentinel</a>
+              <div className="flex items-center gap-3">
+                <button type="button" aria-label="Notifications" className="grid h-10 w-10 place-items-center rounded-full border border-gray-200 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-600/10">
+                  <Bell className="h-4 w-4" />
+                </button>
+                <div className="hidden items-center gap-3 sm:flex">
+                  <span className="grid h-10 w-10 place-items-center rounded-full bg-blue-50 text-sm font-medium text-blue-600">{initials}</span>
+                  <div className="leading-tight">
+                    <p className="text-sm font-medium text-gray-900">{user?.displayName || "MLSentinel user"}</p>
+                    <p className="mt-1 text-xs text-gray-500">{user?.email}</p>
                   </div>
-                </li>
-              ))}
-            </ol>
-          </motion.section>
-        </div>
+                </div>
+                <button type="button" onClick={handleLogout} className="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-600/10" aria-label="Log out">
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Log out</span>
+                </button>
+              </div>
+            </div>
+          </header>
 
-        <motion.section {...enter(0.35)} className="mt-12" aria-labelledby="models-heading">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-sm font-medium text-blue-600">Your models</p>
-              <h2 id="models-heading" className="mt-2 text-2xl font-medium tracking-tight text-gray-900">Production models</h2>
-            </div>
-            <button type="button" className="text-sm font-medium text-blue-600 transition-colors hover:text-blue-700">View all</button>
+          <div className="mx-auto max-w-[1280px] px-6 py-12 sm:px-8 lg:py-16">
+            <motion.section {...enter(0)} className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-sm font-medium text-blue-600">Production overview</p>
+                <h1 className="mt-3 text-4xl font-medium tracking-tight text-gray-900 sm:text-5xl">Good morning, {displayName}.</h1>
+                <p className="mt-4 text-base leading-relaxed text-gray-600">
+                  {hasModels ? "Your production models are being monitored continuously." : "No models tracked yet — send your first report to get started."}
+                </p>
+              </div>
+              <button type="button" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gray-900 px-5 text-sm font-medium text-white transition-colors hover:bg-black focus:outline-none focus:ring-4 focus:ring-gray-900/20">
+                <Plus className="h-4 w-4" />
+                Add model
+              </button>
+            </motion.section>
+
+            {hasModels && (
+              <>
+                <section aria-label="Monitoring summary" className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  <SummaryCard delay={0.05} label="Active models" value={String(summary!.active_models)} detail="" icon={<Activity className="h-4 w-4" />} />
+                  <SummaryCard delay={0.1} label="Overall health" value={summary!.overall_health_score !== null ? `${summary!.overall_health_score}%` : "—"} detail="" icon={<ShieldCheck className="h-4 w-4" />} tone="text-green-600" />
+                  <SummaryCard delay={0.15} label="Healthy models" value={String(summary!.healthy_models)} detail="" icon={<ShieldCheck className="h-4 w-4" />} tone="text-green-600" />
+                  <SummaryCard delay={0.2} label="Critical models" value={String(summary!.critical_models)} detail="" icon={<CircleAlert className="h-4 w-4" />} tone="text-red-600" />
+                </section>
+
+                <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.85fr)]">
+                  <motion.section {...enter(0.25)} className="rounded-xl border border-gray-200 bg-white p-6 sm:p-8" aria-labelledby="health-heading">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-blue-600">System health</p>
+                        <h2 id="health-heading" className="mt-2 text-2xl font-medium tracking-tight text-gray-900">Health score over time</h2>
+                      </div>
+                      <StatusBadge status={summary!.critical_models > 0 ? "Critical" : summary!.warning_models > 0 ? "Warning" : "Healthy"} />
+                    </div>
+                    <div className="mt-8">
+                      <HealthChart trend={data!.health_trend} current={summary!.overall_health_score} />
+                    </div>
+                  </motion.section>
+
+                  <motion.section {...enter(0.3)} className="rounded-xl border border-gray-200 bg-white p-6 sm:p-8" aria-labelledby="activity-heading">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-blue-600">Recent reports</p>
+                        <h2 id="activity-heading" className="mt-2 text-2xl font-medium tracking-tight text-gray-900">Latest runs</h2>
+                      </div>
+                      <button type="button" aria-label="View all activity" className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-600/10"><ArrowUpRight className="h-4 w-4" /></button>
+                    </div>
+                    <ol className="mt-7 divide-y divide-gray-100">
+                      {data!.recent_reports.map((item, i) => (
+                        <li key={i} className="flex gap-3 py-4 first:pt-0 last:pb-0">
+                          <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.issues === 0 ? statusDot.Healthy : statusDot.Warning}`} aria-hidden="true" />
+                          <div>
+                            <p className="text-sm leading-5 text-gray-800">{item.model} — {item.health_score}% ({item.issues} issue{item.issues !== 1 ? "s" : ""})</p>
+                            <p className="mt-1 text-xs text-gray-500">{new Date(item.timestamp).toLocaleString()}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  </motion.section>
+                </div>
+
+                <motion.section {...enter(0.35)} className="mt-12" aria-labelledby="models-heading">
+                  <div className="flex items-end justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-blue-600">Your models</p>
+                      <h2 id="models-heading" className="mt-2 text-2xl font-medium tracking-tight text-gray-900">Production models</h2>
+                    </div>
+                  </div>
+                  <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
+                    <div className="hidden grid-cols-[minmax(180px,1.6fr)_0.8fr_0.8fr_0.8fr_auto] gap-4 border-b border-gray-100 px-6 py-4 text-xs font-medium text-gray-500 md:grid">
+                      <span>Model</span><span>Accuracy</span><span>Recall</span><span>Status</span><span className="sr-only">Open</span>
+                    </div>
+                    <ul>
+                      {data!.model_performance.map((model) => <ModelRow key={model.model_id} model={model} />)}
+                    </ul>
+                  </div>
+                </motion.section>
+              </>
+            )}
           </div>
-          <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
-            <div className="hidden grid-cols-[minmax(180px,1.6fr)_0.8fr_0.8fr_0.8fr_auto] gap-4 border-b border-gray-100 px-6 py-4 text-xs font-medium text-gray-500 md:grid">
-              <span>Model</span><span>Accuracy</span><span>Latency</span><span>Status</span><span className="sr-only">Open</span>
-            </div>
-            <ul>
-              {models.map((model) => <ModelRow key={model.name} model={model} />)}
-            </ul>
-          </div>
-        </motion.section>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 
@@ -174,7 +220,7 @@ function SummaryCard({ delay, label, value, detail, icon, tone = "text-blue-600"
     <motion.article {...enter(delay)} className="rounded-xl border border-gray-200 bg-white p-5 transition-colors hover:border-gray-300 hover:bg-gray-50/50">
       <div className="flex items-center justify-between"><p className="text-sm text-gray-600">{label}</p><span className={tone}>{icon}</span></div>
       <p className="mt-5 text-3xl font-medium tracking-tight text-gray-900">{value}</p>
-      <p className="mt-2 text-xs text-gray-500">{detail}</p>
+      {detail && <p className="mt-2 text-xs text-gray-500">{detail}</p>}
     </motion.article>
   );
 }
@@ -183,30 +229,144 @@ function StatusBadge({ status }: { status: Status }) {
   return <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusClass[status]}`}><span className={`h-1.5 w-1.5 rounded-full ${statusDot[status]}`} />{status}</span>;
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4"><p className="text-xs text-gray-500">{label}</p><p className="mt-2 text-lg font-medium tracking-tight text-gray-900">{value}</p></div>;
-}
 
-function HealthChart() {
+function HealthChart({ trend, current }: { trend: { date: string; health_score: number }[]; current: number | null }) {
+  const width = 620;
+  const height = 190;
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+
+  const formatLabel = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  };
+
+  const formatFull = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
+  };
+
+  const max = trend.length ? Math.max(...trend.map((p) => p.health_score), 100) : 100;
+  const min = trend.length ? Math.min(...trend.map((p) => p.health_score), 0) : 0;
+
+  const getX = (i: number) => (trend.length > 1 ? (i * width) / (trend.length - 1) : width / 2);
+  const getY = (score: number) => height - ((score - min) / (max - min || 1)) * height;
+
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (trend.length === 0) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relativeX = ((e.clientX - rect.left) / rect.width) * width;
+
+    if (trend.length === 1) {
+      setHoverIndex(0);
+      return;
+    }
+
+    const step = width / (trend.length - 1);
+    const index = Math.round(relativeX / step);
+    setHoverIndex(Math.max(0, Math.min(trend.length - 1, index)));
+  };
+
   return (
     <div>
-      <div className="flex items-baseline justify-between"><div><p className="text-sm text-gray-600">Average health score</p><p className="mt-2 text-4xl font-medium tracking-tight text-gray-900">94.6%</p></div><p className="text-sm font-medium text-green-600">+1.8%</p></div>
-      <svg viewBox="0 0 620 190" fill="none" className="mt-6 h-auto w-full" role="img" aria-label="Model health trend for the last seven days">
-        <path d="M0 150H620M0 95H620M0 40H620" stroke="#F3F4F6" strokeWidth="1" />
-        <path d="M0 145C38 138 61 132 94 137C129 142 149 111 189 116C226 121 254 97 286 100C324 104 349 81 381 85C418 89 445 58 478 66C518 76 545 35 620 25" stroke="#2563EB" strokeWidth="3" strokeLinecap="round" />
-        <circle cx="620" cy="25" r="5" fill="#2563EB" /><circle cx="620" cy="25" r="9" stroke="#DBEAFE" strokeWidth="6" />
-      </svg>
-      <div className="mt-2 flex justify-between text-xs text-gray-400"><span>7 days ago</span><span>Today</span></div>
+      <div className="flex items-baseline justify-between">
+        <div>
+          <p className="text-sm text-gray-600">Average health score</p>
+          <p className="mt-2 text-4xl font-medium tracking-tight text-gray-900">{current !== null ? `${current}%` : "—"}</p>
+        </div>
+      </div>
+
+      {trend.length === 0 ? (
+        <p className="mt-8 text-sm text-gray-500">No trend data yet — run more checks to see history.</p>
+      ) : (
+        <div className="relative mt-6">
+          {hoverIndex !== null && (
+            <div
+              className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs shadow-lg"
+              style={{
+                left: `${(getX(hoverIndex) / width) * 100}%`,
+                top: `${(getY(trend[hoverIndex].health_score) / height) * 100}%`,
+                marginTop: "-8px",
+              }}
+            >
+              <p className="font-medium text-gray-900">{formatFull(trend[hoverIndex].date)}</p>
+              <p className="mt-0.5 flex items-center gap-1.5 text-gray-600">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                Health score <span className="font-medium text-gray-900">{trend[hoverIndex].health_score}%</span>
+              </p>
+            </div>
+          )}
+
+          <svg
+            viewBox={`0 0 ${width} ${height}`}
+            fill="none"
+            className="h-auto w-full cursor-crosshair"
+            role="img"
+            aria-label="Model health trend"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setHoverIndex(null)}
+          >
+            <path d={`M0 150H${width}M0 95H${width}M0 40H${width}`} stroke="#F3F4F6" strokeWidth="1" />
+
+            {trend.length > 1 && (
+              <path
+                d={trend
+                  .map((t, i) => `${i === 0 ? "M" : "L"}${getX(i)} ${getY(t.health_score)}`)
+                  .join(" ")}
+                stroke="#2563EB"
+                strokeWidth="3"
+                strokeLinecap="round"
+                fill="none"
+              />
+            )}
+
+            {trend.map((t, i) => (
+              <circle
+                key={i}
+                cx={getX(i)}
+                cy={getY(t.health_score)}
+                r={hoverIndex === i ? 6 : trend.length === 1 ? 5 : 0}
+                fill="#2563EB"
+                className="transition-all"
+              />
+            ))}
+
+            {hoverIndex !== null && (
+              <line
+                x1={getX(hoverIndex)}
+                y1={0}
+                x2={getX(hoverIndex)}
+                y2={height}
+                stroke="#2563EB"
+                strokeWidth="1"
+                strokeDasharray="4 4"
+                opacity="0.3"
+              />
+            )}
+          </svg>
+
+          {trend.length > 1 && (
+            <div className="mt-2 flex justify-between text-xs text-gray-400">
+              <span>{formatLabel(trend[0].date)}</span>
+              <span>{formatLabel(trend[trend.length - 1].date)}</span>
+            </div>
+          )}
+          {trend.length === 1 && (
+            <p className="mt-3 text-center text-xs text-gray-400">
+              One report so far — the trend line will appear once you have more runs.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function ModelRow({ model }: { model: Model }) {
+function ModelRow({ model }: { model: DashboardData["model_performance"][0] }) {
   return (
     <li className="grid gap-3 border-b border-gray-100 px-6 py-5 last:border-b-0 md:grid-cols-[minmax(180px,1.6fr)_0.8fr_0.8fr_0.8fr_auto] md:items-center md:gap-4">
-      <div><p className="text-sm font-medium text-gray-900">{model.name}</p><p className="mt-1 text-xs text-gray-500">{model.version}</p></div>
-      <div className="flex justify-between text-sm md:block"><span className="text-gray-500 md:hidden">Accuracy</span><span>{model.accuracy}</span></div>
-      <div className="flex justify-between text-sm md:block"><span className="text-gray-500 md:hidden">Latency</span><span>{model.latency}</span></div>
+      <div><p className="text-sm font-medium text-gray-900">{model.name}</p><p className="mt-1 text-xs text-gray-500">{model.project}</p></div>
+      <div className="flex justify-between text-sm md:block"><span className="text-gray-500 md:hidden">Accuracy</span><span>{model.metrics.accuracy ?? "—"}</span></div>
+      <div className="flex justify-between text-sm md:block"><span className="text-gray-500 md:hidden">Recall</span><span>{model.metrics.recall ?? "—"}</span></div>
       <div className="flex justify-between md:block"><span className="text-sm text-gray-500 md:hidden">Status</span><StatusBadge status={model.status} /></div>
       <button type="button" aria-label={`Open ${model.name}`} className="hidden rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-600/10 md:inline-flex"><ChevronRight className="h-4 w-4" /></button>
     </li>
