@@ -11,7 +11,11 @@ import CreateProject from "./pages/onboarding/CreateProject";
 import CreateModel from "./pages/onboarding/CreateModel";
 import { OnboardingGuard } from "./components/OnboardingGuard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import ConnectGithub from "./pages/ConnectGithub";
+import GithubCallback from "./pages/GithubCallback";
+import SelectRepo from "./pages/SelectRepo";
 import Dashboard from "./pages/Dashboard";
+import SetupWorkflow from "./pages/SetupWorkflow";
 
 export default function App() {
   return (
@@ -38,6 +42,10 @@ export default function App() {
       <Route path="/onboarding/workspace" element={<ProtectedRoute><CreateWorkspace /></ProtectedRoute>} />
       <Route path="/onboarding/project" element={<ProtectedRoute><CreateProject /></ProtectedRoute>} />
       <Route path="/onboarding/model" element={<ProtectedRoute><CreateModel /></ProtectedRoute>} />
+      <Route path="/dashboard/github/connect" element={<ProtectedRoute><ConnectGithub /></ProtectedRoute>} />
+      <Route path="/github/callback" element={<ProtectedRoute><GithubCallback /></ProtectedRoute>} />
+      <Route path="/dashboard/github/select-repo" element={<ProtectedRoute><SelectRepo /></ProtectedRoute>} />
+      <Route path="/dashboard/github/setup" element={<ProtectedRoute><SetupWorkflow /></ProtectedRoute>} />
     </Routes>
   );
 }

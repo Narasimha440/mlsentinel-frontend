@@ -11,6 +11,7 @@ import {
   KeyRound,
   Settings,
   ChevronDown,
+  GitCommitHorizontal,
 } from "lucide-react";
 
 interface NavItem {
@@ -22,6 +23,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { label: "Github", path: "/dashboard/github/connect", icon: GitCommitHorizontal },
   { label: "Projects", path: "/dashboard/projects", icon: FolderKanban },
   { label: "Models", path: "/dashboard/models", icon: Boxes },
   { label: "Monitoring", path: "/dashboard/monitoring", icon: Activity },
