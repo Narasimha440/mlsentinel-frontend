@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Copy, ArrowRight, ArrowLeft } from "lucide-react";
 import { SPRING } from "../../lib/motion";
@@ -135,14 +135,17 @@ export function AddModelModal({ open, onClose, onCreated, user, apiBase }: AddMo
     setLoadingProjects(false);
   };
 
-  const openModal = () => {
+  useEffect(() => {
+    if (!open) return;
+
     setStep(1);
     setApiKey(null);
     setModelName("");
     setFramework("generic");
     setWorkflow("manual");
+
     loadProjects();
-  };
+  }, [open])
 
   const handleClose = () => {
     onClose();

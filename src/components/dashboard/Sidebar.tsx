@@ -14,12 +14,12 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
-interface NavItem {
-  label: string;
-  path: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge?: number;
-}
+// interface NavItem {
+//   label: string;
+//   path: string;
+//   icon: React.ComponentType<{ className?: string }>;
+//   badge?: number;
+// }
 
 // interface NavSection {
 //   title: string;
