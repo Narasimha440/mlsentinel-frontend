@@ -11,32 +11,44 @@ import CreateProject from "./pages/onboarding/CreateProject";
 import CreateModel from "./pages/onboarding/CreateModel";
 import { OnboardingGuard } from "./components/OnboardingGuard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { PublicRoute } from "./components/PublicRoute";
 import ConnectGithub from "./pages/ConnectGithub";
 import GithubCallback from "./pages/GithubCallback";
 import SelectRepo from "./pages/SelectRepo";
 import Dashboard from "./pages/Dashboard";
 import SetupWorkflow from "./pages/SetupWorkflow";
+import ProjectsPage from "./pages/ProjectsPage";
+import SettingsPage from "./pages/SettingsPage";
+import AlertsPage from "./pages/AlertsPage";
+import ModelsPage from "./pages/ModelsPage";
+import MonitoringPage from "./pages/MonitoringPage";
+import DataQualityPage from "./pages/DataQualityPage";
+import AddModelPage from "./pages/AddModelPage";
 
 export default function App() {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <>
-            <Navbar />
-            <SmoothScroll>
-              <main>
-                <Hero />
-                <ProblemSection />
-              </main>
-            </SmoothScroll>
-          </>
-        }
-      />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<LoginPage mode="signup" />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route element={<PublicRoute />}>
+        <Route
+          path="/"
+          element={
+            <>
+              <Navbar />
+              <SmoothScroll>
+                <main>
+                  <Hero />
+                  <ProblemSection />
+                </main>
+              </SmoothScroll>
+            </>
+          }
+        />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<LoginPage mode="signup" />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      </Route>
+
+      {/* PROTECTED ROUTES - Redirects to /login if NOT logged in */}
       <Route path="/dashboard" element={<ProtectedRoute><OnboardingGuard><Dashboard /></OnboardingGuard></ProtectedRoute>} />
       <Route path="/dashboard/api-keys" element={<ProtectedRoute><ApiKeysPage /></ProtectedRoute>} />
       <Route path="/onboarding/workspace" element={<ProtectedRoute><CreateWorkspace /></ProtectedRoute>} />
@@ -46,6 +58,13 @@ export default function App() {
       <Route path="/github/callback" element={<ProtectedRoute><GithubCallback /></ProtectedRoute>} />
       <Route path="/dashboard/github/select-repo" element={<ProtectedRoute><SelectRepo /></ProtectedRoute>} />
       <Route path="/dashboard/github/setup" element={<ProtectedRoute><SetupWorkflow /></ProtectedRoute>} />
+      <Route path="/dashboard/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
+      <Route path="/dashboard/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+      <Route path="/dashboard/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
+      <Route path="/dashboard/models" element={<ProtectedRoute><ModelsPage /></ProtectedRoute>} />
+      <Route path="/dashboard/monitoring" element={<ProtectedRoute><MonitoringPage /></ProtectedRoute>} />
+      <Route path="/dashboard/data-quality" element={<ProtectedRoute><DataQualityPage /></ProtectedRoute>} />
+      <Route path="/dashboard/add-model" element={<ProtectedRoute><AddModelPage /></ProtectedRoute>} />
     </Routes>
   );
 }

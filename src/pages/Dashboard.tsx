@@ -7,6 +7,8 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Activity, ArrowUpRight, Bell, ChevronRight, CircleAlert, LogOut, Plus, ShieldCheck } from "lucide-react";
 import { SPRING } from "../lib/motion";
+import { AddModelModal } from "../components/dashboard/AddModelModal";
+import { WhatsNewModal } from "../components/dashboard/WhatsNewModal";
 
 type Status = "Healthy" | "Warning" | "Critical";
 
@@ -28,6 +30,7 @@ interface DashboardData {
     status: Status;
     last_updated: string;
   }[];
+  available_models: { model_id: number; name: string; project: string }[];
   findings: { model: string; issue: string; severity: string; detected_at: string }[];
   recommendations: { model: string; recommendation: string; severity: string }[];
   recent_reports: { project: string; model: string; health_score: number; issues: number; timestamp: string }[];
@@ -54,19 +57,48 @@ const enter = (delay: number) => ({
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 export default function Dashboard() {
+  interface DataQualitySummary {
+    model_id: number;
+    model_name: string;
+    project_name: string;
+    row_count: number;
+    duplicate_row_percentage: number;
+    findings: { severity: string }[];
+    checked_at: string;
+  }
+
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedModelId, setSelectedModelId] = useState<number | null>(null);
+  const [dataQuality, setDataQuality] = useState<DataQualitySummary[]>([]);
+  const [showAddModelModal, setShowAddModelModal] = useState(false);
+
+
+  const refetchDashboard = async () => {
+    if (!user) return;
+    const token = await user.getIdToken();
+    const url = selectedModelId
+      ? `${API_BASE}/api/dashboard?model_id=${selectedModelId}`
+      : `${API_BASE}/api/dashboard`;
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (res.ok) setData(await res.json());
+  };
 
   useEffect(() => {
     if (!user) return;
 
+
     const fetchDashboard = async () => {
+      setLoadingData(true);
       try {
         const token = await user.getIdToken();
-        const res = await fetch(`${API_BASE}/api/dashboard`, {
+        const url = selectedModelId
+          ? `${API_BASE}/api/dashboard?model_id=${selectedModelId}`
+          : `${API_BASE}/api/dashboard`;
+        const res = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error(`Request failed: ${res.status}`);
@@ -80,6 +112,22 @@ export default function Dashboard() {
     };
 
     fetchDashboard();
+  }, [user, selectedModelId]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    (async () => {
+      const token = await user.getIdToken();
+      const res = await fetch(`${API_BASE}/api/dashboard/data-quality`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        setDataQuality(json.reports);
+      }
+    })();
   }, [user]);
 
   const handleLogout = async () => {
@@ -87,7 +135,7 @@ export default function Dashboard() {
     navigate("/");
   };
 
-  if (isLoading || loadingData) {
+  if (isLoading || (!data && loadingData)) {
     return <main className="flex min-h-screen items-center justify-center bg-white text-sm text-gray-500">Loading dashboard…</main>;
   }
 
@@ -140,7 +188,7 @@ export default function Dashboard() {
                   {hasModels ? "Your production models are being monitored continuously." : "No models tracked yet — send your first report to get started."}
                 </p>
               </div>
-              <button type="button" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gray-900 px-5 text-sm font-medium text-white transition-colors hover:bg-black focus:outline-none focus:ring-4 focus:ring-gray-900/20">
+              <button type="button" onClick={() => setShowAddModelModal(true)} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gray-900 px-5 text-sm font-medium text-white transition-colors hover:bg-black focus:outline-none focus:ring-4 focus:ring-gray-900/20">
                 <Plus className="h-4 w-4" />
                 Add model
               </button>
@@ -162,9 +210,25 @@ export default function Dashboard() {
                         <p className="text-sm font-medium text-blue-600">System health</p>
                         <h2 id="health-heading" className="mt-2 text-2xl font-medium tracking-tight text-gray-900">Health score over time</h2>
                       </div>
+                      <div className="flex items-center gap-3">
+                        {data && data.available_models.length > 0 && (
+                          <select
+                            value={selectedModelId ?? "all"}
+                            onChange={(e) => setSelectedModelId(e.target.value === "all" ? null : Number(e.target.value))}
+                            className="h-9 rounded-full border border-gray-200 px-4 text-sm font-medium text-gray-700 focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-600/10"
+                          >
+                            <option value="all">All models</option>
+                            {data.available_models.map((m) => (
+                              <option key={m.model_id} value={m.model_id}>
+                                {m.project} / {m.name}
+                              </option>
+                            ))}
+                          </select>
+                        )}
                       <StatusBadge status={summary!.critical_models > 0 ? "Critical" : summary!.warning_models > 0 ? "Warning" : "Healthy"} />
                     </div>
-                    <div className="mt-8">
+                  </div>
+                    <div className={`mt-8 transition-opacity duration-200 ${loadingData ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                       <HealthChart trend={data!.health_trend} current={summary!.overall_health_score} />
                     </div>
                   </motion.section>
@@ -177,17 +241,27 @@ export default function Dashboard() {
                       </div>
                       <button type="button" aria-label="View all activity" className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-600/10"><ArrowUpRight className="h-4 w-4" /></button>
                     </div>
-                    <ol className="mt-7 divide-y divide-gray-100">
-                      {data!.recent_reports.map((item, i) => (
-                        <li key={i} className="flex gap-3 py-4 first:pt-0 last:pb-0">
-                          <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${item.issues === 0 ? statusDot.Healthy : statusDot.Warning}`} aria-hidden="true" />
-                          <div>
-                            <p className="text-sm leading-5 text-gray-800">{item.model} — {item.health_score}% ({item.issues} issue{item.issues !== 1 ? "s" : ""})</p>
-                            <p className="mt-1 text-xs text-gray-500">{new Date(item.timestamp).toLocaleString()}</p>
-                          </div>
-                        </li>
-                      ))}
-                    </ol>
+                    <div className="mt-7 max-h-[350px] overflow-y-auto pr-2">
+                      <ol className="divide-y divide-gray-100">
+                          {data!.recent_reports.map((item, i) => (
+                            <li key={i} className="flex gap-3 py-4 first:pt-0 last:pb-0">
+                              <span
+                                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+                                  item.issues === 0 ? statusDot.Healthy : statusDot.Warning
+                                }`}
+                              />
+                              <div>
+                                <p className="text-sm leading-5 text-gray-800">
+                                  {item.model} — {item.health_score}% ({item.issues} issue{item.issues !== 1 ? "s" : ""})
+                                </p>
+                                <p className="mt-1 text-xs text-gray-500">
+                                  {new Date(item.timestamp).toLocaleString()}
+                                </p>
+                              </div>
+                            </li>
+                          ))}
+                        </ol>
+                    </div>
                   </motion.section>
                 </div>
 
@@ -207,10 +281,69 @@ export default function Dashboard() {
                     </ul>
                   </div>
                 </motion.section>
+
+                {dataQuality.length > 0 && (
+                  <motion.section {...enter(0.4)} className="mt-12" aria-labelledby="quality-heading">
+                    <div className="flex items-end justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-blue-600">Data Health</p>
+                        <h2 id="quality-heading" className="mt-2 text-2xl font-medium tracking-tight text-gray-900">Data Quality</h2>
+                      </div>
+                      <a href="/dashboard/data-quality" className="text-sm font-medium text-blue-600 hover:text-blue-700">
+                        View all →
+                      </a>
+                    </div>
+                    <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      {dataQuality.map((dq) => {
+                        const criticalCount = dq.findings.filter((f) => f.severity === "critical").length;
+                        const warningCount = dq.findings.filter((f) => f.severity === "warning").length;
+
+                        return (
+                          <div key={dq.model_id} className="rounded-xl border border-gray-200 bg-white p-5 transition-colors hover:border-gray-300 hover:bg-gray-50/50">
+                            <p className="text-sm font-medium text-gray-900">{dq.model_name}</p>
+                            <p className="text-xs text-gray-500">{dq.project_name}</p>
+                            <div className="mt-4 flex items-baseline gap-2">
+                              <span className="text-2xl font-medium tracking-tight text-gray-900">
+                                {dq.row_count.toLocaleString()}
+                              </span>
+                              <span className="text-xs text-gray-500">Rows checked</span>
+                            </div>
+                            <div className="mt-3 flex items-center gap-3 text-xs">
+                              <span className="text-gray-500">{dq.duplicate_row_percentage}% duplicates</span>
+                              {criticalCount > 0 && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 font-medium text-red-700">
+                                  {criticalCount} critical
+                                </span>
+                              )}
+                              {warningCount > 0 && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 font-medium text-amber-700">
+                                  {warningCount} warning{warningCount !== 1 ? "s" : ""}
+                                </span>
+                              )}
+                              {criticalCount === 0 && warningCount === 0 && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 font-medium text-green0700">
+                                  No issues
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </motion.section>
+                )}
               </>
             )}
           </div>
       </main>
+      <AddModelModal
+        open={showAddModelModal}
+        onClose={() => setShowAddModelModal(false)}
+        onCreated={refetchDashboard}
+        user={user}
+        apiBase={API_BASE}
+      />
+      <WhatsNewModal userId={user?.uid} />
     </div>
   );
 }
@@ -233,6 +366,30 @@ function StatusBadge({ status }: { status: Status }) {
 function HealthChart({ trend, current }: { trend: { date: string; health_score: number }[]; current: number | null }) {
   const width = 620;
   const height = 190;
+
+  const topPadding = 20;
+  const bottomPadding = 25;
+
+  const chartHeight = height - topPadding - bottomPadding;
+
+  const max = trend.length
+    ? Math.max(...trend.map((p) => p.health_score), 100)
+    : 100;
+  
+  const min = trend.length
+    ? Math.min(...trend.map((p) => p.health_score), 0)
+    : 0;
+
+  const getX = (i: number) =>
+    trend.length > 1
+    ? (i * width) / (trend.length - 1)
+    : width / 2;
+  
+  const getY = (score: number) =>
+    topPadding +
+    chartHeight -
+    ((score - min) / (max - min || 1)) * chartHeight;
+  
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   const formatLabel = (dateStr: string) => {
@@ -245,11 +402,6 @@ function HealthChart({ trend, current }: { trend: { date: string; health_score: 
     return d.toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
   };
 
-  const max = trend.length ? Math.max(...trend.map((p) => p.health_score), 100) : 100;
-  const min = trend.length ? Math.min(...trend.map((p) => p.health_score), 0) : 0;
-
-  const getX = (i: number) => (trend.length > 1 ? (i * width) / (trend.length - 1) : width / 2);
-  const getY = (score: number) => height - ((score - min) / (max - min || 1)) * height;
 
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     if (trend.length === 0) return;
