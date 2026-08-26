@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Database,
 } from "lucide-react";
+import { GithubIcon } from "../icons/GithubIcon";
 import { AnimatePresence, motion } from "framer-motion";
 
 // interface NavItem {
@@ -30,7 +31,6 @@ interface SidebarProps {
   userName: string;
   userEmail: string;
   userPhotoUrl?: string;
-  workspaceName?: string;
   workspacePlan?: string;
   idToken?: string;
 }
@@ -39,10 +39,12 @@ export function Sidebar({
   userName,
   userEmail,
   userPhotoUrl,
-  workspaceName = "My Workspace",
-  workspacePlan = "Free Plan",
+  workspacePlan = "",
   idToken,
 }: SidebarProps) {
+  const navigate = useNavigate();
+
+
   const initials = userName
   .split(" ")
   .map((p) => p[0])
@@ -51,6 +53,7 @@ export function Sidebar({
   .toUpperCase();
   
   const [alertCount, setAlertCount] = useState(0);
+  const [workspaceName, setWorkspaceName] = useState("My Workspace");  
   const [expandedSections, setExpandedSections] = useState({
     Overview: true,
     Workspace: true,
@@ -129,14 +132,41 @@ export function Sidebar({
           {
             label: "Settings",
             path: "/dashboard/settings",
-            icon: Settings
+            icon: Settings,
           },
+          {
+            label: "Github Connect",
+            path: "/dashboard/github/connect",
+            icon: GithubIcon,
+          }
         ],
       },
     ];
 
     useEffect(() => {
       if (!idToken) return;
+
+      const fetchWorkspace = async () => {
+        try {
+          const res = await fetch(`${API_BASE}/api/workspace`, {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+            },
+          });
+
+          if (!res.ok) return;
+
+          const data = await res.json();
+
+          if (data.name && typeof data.name === "string") {
+            setWorkspaceName(data.name);
+          }
+        } catch {
+          
+        }
+      };
+
+      fetchWorkspace();
 
       const fetchAlertCount = async () => {
         try {
@@ -173,39 +203,40 @@ export function Sidebar({
   return (
     <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-gray-200 bg-white">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-6">
-        <img
-          src="https://raw.githubusercontent.com/Narasimha440/mlsentinal/main/logo.png"
-          alt="MLSentinel"
-          className="h-11 w-11 rounded-xl"
-        />
-
-        <div className="leading-tight">
-          <h1 className="text-[18px] font-semibold tracking-tight text-gray-900">
-            MLSentinel
-          </h1>
-
-          <div className="mt-1 inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
-            v1.2.0
-          </div>
-        </div>
+      <div className="px-5 py-5">
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          draggable={false}
+          aria-label="Go to MLSentinel home"
+          className="block cursor-pointer border-0 bg-transparent p-0 outline-none"
+        >
+          <img
+            src="/image.png"
+            alt="MLSentinel"
+            draggable={false}
+            onDragStart={(e) => e.preventDefault()}
+            onContextMenu={(e) => e.preventDefault()}
+            className="h-auto w-[190px] select-none object-contain"
+          />
+        </button>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-3 py-2">
         {navigation.map((section) => (
-          <div key={section.title} className="mb-5">
+          <div key={section.title} className="mb-4">
 
             <button
               onClick={() =>
                 toggleSection(section.title as keyof typeof expandedSections)
               }
-              className="mb-2 flex w-full items-center justify-between px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400 hover:text-gray-600"
+              className="mb-2 flex w-full items-center justify-between px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 hover:text-gray-600"
             >
               <span>{section.title}</span>
 
               <ChevronDown
-                className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                className={`h-3 w-3 transition-transform duration-200 ${
                   expandedSections[
                     section.title as keyof typeof expandedSections
                   ]

@@ -9,6 +9,7 @@ import { Activity, ArrowUpRight, Bell, ChevronRight, CircleAlert, LogOut, Plus, 
 import { SPRING } from "../lib/motion";
 import { AddModelModal } from "../components/dashboard/AddModelModal";
 import { WhatsNewModal } from "../components/dashboard/WhatsNewModal";
+import { AlertsBell } from "../components/dashboard/AlertsBell";
 
 type Status = "Healthy" | "Warning" | "Critical";
 
@@ -75,7 +76,9 @@ export default function Dashboard() {
   const [selectedModelId, setSelectedModelId] = useState<number | null>(null);
   const [dataQuality, setDataQuality] = useState<DataQualitySummary[]>([]);
   const [showAddModelModal, setShowAddModelModal] = useState(false);
+  const [idToken, setIdToken] = useState<string | undefined>();
 
+  
 
   const refetchDashboard = async () => {
     if (!user) return;
@@ -88,7 +91,13 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
+    if (user) user.getIdToken().then(setIdToken);
+  }, [user]);
+
+  useEffect(() => {
     if (!user) return;
+
+    user.getIdToken().then(setIdToken);
 
 
     const fetchDashboard = async () => {
@@ -151,19 +160,11 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Sidebar
-        userName={user?.displayName || "MLSentinel user"}
-        userEmail={user?.email || ""}
-        userPhotoUrl={user?.photoURL || undefined}
-      />
-      <main className="ml-64 min-h-screen bg-white">
           <header className="border-b border-gray-200">
-            <div className="mx-auto flex h-20 max-w-[1280px] items-center justify-between px-6 sm:px-8">
+            <div className="flex h-20 items-center justify-between px-8">
               <a href="/" className="text-[19px] font-medium tracking-tight text-ink">MLSentinel</a>
               <div className="flex items-center gap-3">
-                <button type="button" aria-label="Notifications" className="grid h-10 w-10 place-items-center rounded-full border border-gray-200 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-600/10">
-                  <Bell className="h-4 w-4" />
-                </button>
+                <AlertsBell idToken={idToken} apiBase={API_BASE} />
                 <div className="hidden items-center gap-3 sm:flex">
                   <span className="grid h-10 w-10 place-items-center rounded-full bg-blue-50 text-sm font-medium text-blue-600">{initials}</span>
                   <div className="leading-tight">
@@ -179,11 +180,11 @@ export default function Dashboard() {
             </div>
           </header>
 
-          <div className="mx-auto max-w-[1280px] px-6 py-12 sm:px-8 lg:py-16">
+          <div className="w-full px-8 py-12 lg:px-10 lg:py-16">
             <motion.section {...enter(0)} className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
               <div>
                 <p className="text-sm font-medium text-blue-600">Production overview</p>
-                <h1 className="mt-3 text-4xl font-medium tracking-tight text-gray-900 sm:text-5xl">Good morning, {displayName}.</h1>
+                <h1 className="mt-3 text-4xl font-medium tracking-tight text-gray-900 sm:text-5xl">Good to see you, {displayName}.</h1>
                 <p className="mt-4 text-base leading-relaxed text-gray-600">
                   {hasModels ? "Your production models are being monitored continuously." : "No models tracked yet — send your first report to get started."}
                 </p>
@@ -335,7 +336,6 @@ export default function Dashboard() {
               </>
             )}
           </div>
-      </main>
       <AddModelModal
         open={showAddModelModal}
         onClose={() => setShowAddModelModal(false)}

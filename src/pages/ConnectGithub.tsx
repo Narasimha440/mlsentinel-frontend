@@ -18,15 +18,37 @@ export default function ConnectGithub() {
 
   const checkConnection = async () => {
     if (!user) return;
-    const token = await user.getIdToken();
-    const res = await fetch(`${API_BASE}/api/github/status`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setConnected(data.connected);
+
+    try {
+      const token = await user.getIdToken();
+
+      const res = await fetch(`${API_BASE}/api/github/status`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+
+      if (res.ok) {
+        const data = await res.json();
+
+        if (data.connected) {
+          setConnected(true);
+
+          navigate("/dashboard/github/select-repo", {
+            replace: true,
+          });
+
+          return;
+        }
+
+        setConnected(false);
+      }
+    } catch (error) {
+      console.error("Failed to fetch Github connection:", error);
+    } finally {
+      setChecking(false);
     }
-    setChecking(false);
   };
 
   useEffect(() => {

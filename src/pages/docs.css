@@ -1,0 +1,1916 @@
+/* =========================================================
+   DOCUMENTATION PAGE SCOPED STYLES
+   All rules are isolated under .docs-page so they cannot affect
+   the dashboard, sidebar, landing page, or other application pages.
+========================================================= */
+
+.docs-page,
+.docs-page * {
+  box-sizing: border-box;
+}
+
+.docs-page * {
+  box-sizing: border-box;
+}
+
+
+
+
+
+
+.docs-page {
+  margin: 0;
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  background: #ffffff;
+  color: #111827;
+}
+
+
+
+.docs-page button,
+.docs-page input {
+  font: inherit;
+}
+
+
+
+.docs-page button {
+  cursor: pointer;
+}
+
+
+
+.docs-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+
+/* =========================================================
+   COLORS
+========================================================= */
+
+
+
+.docs-page {
+  --blue: #1455ff;
+  --blue-dark: #0f3fc2;
+  --blue-light: #eef4ff;
+
+  --background: #ffffff;
+
+  --surface: #f8fafc;
+  --surface-strong: #f1f5f9;
+
+  --text: #111827;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+
+  --border: #e5e7eb;
+  --border-strong: #d7dce4;
+
+  /*
+    Documentation editor colors.
+    Intentionally charcoal rather than
+    pure black or neon.
+  */
+
+  --editor: #171918;
+  --editor-border: #202321;
+  --editor-comment: #7d817b;
+
+  --editor-text: #f3f3ed;
+
+  --editor-keyword: #d7d3a5;
+  --editor-string: #82c996;
+  --editor-number: #e4b47c;
+  --editor-function: #d7e3c1;
+  --editor-class: #c8d8c0;
+  --editor-variable: #f0eee7;
+  --editor-punctuation: #d0d2cb;
+
+  --warning-background: #fffaf0;
+  --warning-border: #f2dfb5;
+  --warning-text: #92400e;
+}
+
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+
+
+.docs-page {
+  min-height: 100vh;
+
+  background: #ffffff;
+}
+
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+
+
+.docs-page .docs-header {
+  height: 72px;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 50;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 7px 32px 0;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid var(--border);
+}
+
+
+
+.docs-page .header-left,
+.docs-page .header-right {
+  display: flex;
+  align-items: center;
+}
+
+
+
+.docs-page .header-left {
+  gap: 22px;
+}
+
+
+
+.docs-page .header-right {
+  gap: 10px;
+}
+
+
+
+.docs-page .brand {
+  display: flex;
+  align-items: center;
+}
+
+
+
+.docs-page .docs-logo {
+  width: 175px;
+
+  display: block;
+
+  object-fit: contain;
+}
+
+
+
+.docs-page .header-divider {
+  width: 1px;
+  height: 24px;
+
+  background: var(--border);
+}
+
+
+
+.docs-page .header-title {
+  color: var(--text-muted);
+
+  font-size: 14px;
+}
+
+
+
+/* =========================================================
+   VERSION
+========================================================= */
+
+
+
+.docs-page .version-wrapper {
+  position: relative;
+
+  margin-right: 8px;
+}
+
+
+
+.docs-page .version-button {
+  min-width: 142px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 8px 11px;
+
+  background: #ffffff;
+
+  border: 1px solid var(--border-strong);
+
+  border-radius: 6px;
+
+  color: var(--text);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+
+.docs-page .version-button:hover {
+  border-color: var(--blue);
+}
+
+
+
+.docs-page .rotate-icon {
+  transform: rotate(180deg);
+}
+
+
+
+.docs-page .version-menu {
+  position: absolute;
+
+  top: calc(100% + 7px);
+  right: 0;
+
+  width: 190px;
+
+  padding: 6px;
+
+  background: #ffffff;
+
+  border: 1px solid var(--border);
+
+  border-radius: 6px;
+
+  box-shadow:
+    0 12px 30px
+    rgba(15, 23, 42, 0.09);
+}
+
+
+
+.docs-page .version-current {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 9px 10px;
+
+  background: var(--blue-light);
+
+  color: var(--blue);
+
+  border-radius: 4px;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+
+.docs-page .current-label {
+  color: var(--text-muted);
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+
+
+/* =========================================================
+   HEADER CONTROLS
+========================================================= */
+
+
+
+.docs-page .header-icon-button,
+.docs-page .header-github {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+
+  border: 1px solid transparent;
+
+  border-radius: 6px;
+
+  color: var(--text-secondary);
+}
+
+
+
+.docs-page .header-icon-button:hover,
+.docs-page .header-github:hover {
+  color: var(--blue);
+
+  background: var(--surface);
+
+  border-color: var(--border);
+}
+
+
+
+.docs-page .header-github svg {
+  width: 18px;
+  height: 18px;
+}
+
+
+
+.docs-page .header-link {
+  margin-left: 8px;
+
+  padding: 7px 9px;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+}
+
+
+
+.docs-page .header-link:hover {
+  color: var(--blue);
+}
+
+
+
+.docs-page .mobile-menu-button {
+  display: none;
+
+  width: 34px;
+  height: 34px;
+
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+
+  border: 1px solid var(--border);
+
+  border-radius: 6px;
+
+  color: var(--text);
+}
+
+
+
+/* =========================================================
+   DOCUMENTATION LAYOUT
+========================================================= */
+
+
+
+.docs-page .docs-layout {
+  display: grid;
+
+  grid-template-columns:
+    250px
+    minmax(0, 900px)
+    190px;
+
+  justify-content: center;
+
+  gap: 56px;
+
+  max-width: 1500px;
+
+  margin: 0 auto;
+
+  padding: 0 32px;
+}
+
+
+
+/* =========================================================
+   LEFT SIDEBAR
+========================================================= */
+
+
+
+.docs-page .docs-sidebar {
+  position: sticky;
+
+  top: 72px;
+
+  align-self: start;
+
+  height: calc(100vh - 72px);
+
+  overflow-y: auto;
+
+  padding: 34px 0 40px;
+}
+
+
+
+.docs-page .sidebar-heading {
+  margin-bottom: 10px;
+
+  color: var(--text-faint);
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.15em;
+}
+
+
+
+.docs-page .sidebar-link {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 9px 12px;
+
+  margin-bottom: 2px;
+
+  text-align: left;
+
+  background: transparent;
+
+  border: none;
+
+  border-radius: 5px;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+}
+
+
+
+.docs-page .sidebar-link:hover {
+  color: var(--blue);
+
+  background: var(--surface);
+}
+
+
+
+.docs-page .sidebar-link.active {
+  color: var(--blue);
+
+  background: var(--blue-light);
+
+  font-weight: 600;
+
+  border-left: 2px solid var(--blue);
+
+  border-radius: 0 5px 5px 0;
+}
+
+
+
+.docs-page .sidebar-divider {
+  height: 1px;
+
+  background: var(--border);
+
+  margin: 26px 0;
+}
+
+
+
+.docs-page .sidebar-external {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 8px 12px;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+}
+
+
+
+.docs-page .sidebar-external:hover {
+  color: var(--blue);
+}
+
+
+
+.docs-page .sidebar-external svg {
+  width: 14px;
+  height: 14px;
+}
+
+
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+
+
+.docs-page .docs-content {
+  min-width: 0;
+
+  padding: 68px 0 100px;
+}
+
+
+
+.docs-page .docs-section {
+  scroll-margin-top: 105px;
+
+  padding-bottom: 92px;
+}
+
+
+
+.docs-page .eyebrow {
+  display: inline-block;
+
+  margin-bottom: 9px;
+
+  color: var(--blue);
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.09em;
+}
+
+
+
+.docs-page .version-badge {
+  width: fit-content;
+
+  margin-bottom: 17px;
+
+  padding: 4px 7px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+
+  border-radius: 4px;
+
+  color: var(--text-muted);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 10px;
+}
+
+
+
+.docs-page .docs-section h1 {
+  margin: 0 0 20px;
+
+  color: var(--text);
+
+  font-size: clamp(38px, 5vw, 58px);
+
+  line-height: 1.06;
+
+  font-weight: 600;
+
+  letter-spacing: -0.045em;
+}
+
+
+
+.docs-page .docs-section h2 {
+  margin: 0 0 18px;
+
+  color: var(--text);
+
+  font-size: 31px;
+
+  line-height: 1.2;
+
+  font-weight: 600;
+
+  letter-spacing: -0.03em;
+}
+
+
+
+.docs-page .docs-section h3 {
+  margin: 42px 0 14px;
+
+  color: var(--text);
+
+  font-size: 19px;
+
+  font-weight: 600;
+
+  letter-spacing: -0.02em;
+}
+
+
+
+.docs-page .docs-section p {
+  max-width: 760px;
+
+  margin: 0 0 18px;
+
+  color: var(--text-secondary);
+
+  font-size: 15px;
+
+  line-height: 1.75;
+}
+
+
+
+.docs-page .docs-section code {
+  padding: 2px 5px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+
+  border-radius: 3px;
+
+  color: var(--text);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 0.88em;
+}
+
+
+
+.docs-page .lead {
+  max-width: 700px !important;
+
+  font-size: 18px !important;
+
+  line-height: 1.7 !important;
+}
+
+
+
+.docs-page .section-number {
+  margin-bottom: 12px;
+
+  color: var(--text-faint);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 11px;
+}
+
+
+
+.docs-page .section-rule {
+  height: 1px;
+
+  background: var(--border);
+
+  margin: 54px 0;
+}
+
+
+
+.docs-page .intro-links {
+  display: flex;
+
+  gap: 22px;
+
+  margin-top: 28px;
+}
+
+
+
+.docs-page .intro-links button,
+.docs-page .intro-links a {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 9px 0;
+
+  background: transparent;
+
+  border: none;
+
+  color: var(--blue);
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+
+.docs-page .intro-links button:hover,
+.docs-page .intro-links a:hover {
+  color: var(--blue-dark);
+}
+
+
+
+/* =========================================================
+   FLOW
+========================================================= */
+
+
+
+.docs-page .simple-flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-top: 32px;
+
+  padding: 17px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+
+  border-radius: 6px;
+
+  color: var(--text);
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+
+.docs-page .simple-flow svg {
+  color: var(--blue);
+}
+
+
+
+/* =========================================================
+   NEW EDITOR
+========================================================= */
+
+
+
+.docs-page .docs-code {
+  position: relative;
+
+  width: 100%;
+
+  margin: 26px 0 30px;
+
+  overflow: hidden;
+
+  background: var(--editor);
+
+  border: 1px solid var(--editor-border);
+
+  border-radius: 8px;
+
+  box-shadow:
+    0 7px 22px
+    rgba(15, 23, 42, 0.07);
+}
+
+
+
+/*
+  This is intentionally very close
+  to the compact editor shown in
+  the second reference image.
+*/
+
+
+
+.docs-page .code-toolbar {
+  min-height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 10px 16px 4px 18px;
+}
+
+
+
+.docs-page .code-comment {
+  color: var(--editor-comment);
+
+  font-family:
+    "JetBrains Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 12px;
+
+  letter-spacing: 0.02em;
+
+  user-select: none;
+}
+
+
+
+.docs-page .code-copy {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+
+  border: none;
+
+  border-radius: 4px;
+
+  color: #777c75;
+
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+
+
+.docs-page .code-copy:hover {
+  color: #d7d9d2;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.05
+  );
+}
+
+
+
+.docs-page .code-scroll {
+  overflow-x: auto;
+
+  overflow-y: hidden;
+
+  padding: 0 18px 22px;
+}
+
+
+
+.docs-page .code-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+
+
+.docs-page .code-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+
+.docs-page .code-scroll::-webkit-scrollbar-thumb {
+  background: #30332f;
+
+  border-radius: 20px;
+}
+
+
+
+.docs-page .code-content {
+  margin: 0;
+
+  padding: 0;
+
+  min-width: max-content;
+
+  background: transparent;
+
+  border: none;
+
+  color: var(--editor-text);
+
+  font-family:
+    "JetBrains Mono",
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+
+  font-size: 14px;
+
+  line-height: 1.8;
+
+  tab-size: 4;
+}
+
+
+
+.docs-page .code-content code {
+  display: block;
+
+  padding: 0 !important;
+
+  margin: 0 !important;
+
+  background: transparent !important;
+
+  border: none !important;
+
+  border-radius: 0 !important;
+
+  color: inherit;
+
+  font-family: inherit;
+
+  font-size: inherit;
+
+  white-space: pre;
+}
+
+
+
+/* =========================================================
+   SYNTAX HIGHLIGHTING
+========================================================= */
+
+
+
+.docs-page .code-content .token.comment {
+  color: #747870;
+}
+
+
+
+.docs-page .code-content .token.keyword {
+  color: var(--editor-keyword);
+}
+
+
+
+.docs-page .code-content .token.string {
+  color: var(--editor-string);
+}
+
+
+
+.docs-page .code-content .token.number {
+  color: var(--editor-number);
+}
+
+
+
+.docs-page .code-content .token.boolean {
+  color: var(--editor-number);
+}
+
+
+
+.docs-page .code-content .token.function {
+  color: var(--editor-function);
+}
+
+
+
+.docs-page .code-content .token.class-name {
+  color: var(--editor-class);
+}
+
+
+
+.docs-page .code-content .token.builtin {
+  color: #b7c9a9;
+}
+
+
+
+.docs-page .code-content .token.variable {
+  color: var(--editor-variable);
+}
+
+
+
+.docs-page .code-content .token.operator {
+  color: var(--editor-punctuation);
+}
+
+
+
+.docs-page .code-content .token.punctuation {
+  color: var(--editor-punctuation);
+}
+
+
+
+.docs-page .code-content .token.property {
+  color: #c8d0be;
+}
+
+
+
+.docs-page .code-content .token.constant {
+  color: var(--editor-number);
+}
+
+
+
+.docs-page .code-content .token.decorator {
+  color: #bdb797;
+}
+
+
+
+/* =========================================================
+   EXPLANATION
+========================================================= */
+
+
+
+.docs-page .explanation {
+  margin: 24px 0;
+
+  padding: 18px 20px;
+
+  background: var(--surface);
+
+  border-left: 3px solid var(--blue);
+
+  border-top: 1px solid var(--border);
+
+  border-right: 1px solid var(--border);
+
+  border-bottom: 1px solid var(--border);
+}
+
+
+
+.docs-page .explanation-title {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  margin-bottom: 9px;
+
+  color: var(--text);
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+
+.docs-page .explanation-title svg {
+  color: var(--blue);
+}
+
+
+
+.docs-page .explanation p {
+  margin-bottom: 8px;
+
+  font-size: 14px;
+}
+
+
+
+.docs-page .explanation p:last-child {
+  margin-bottom: 0;
+}
+
+
+
+/* =========================================================
+   STEPS
+========================================================= */
+
+
+
+.docs-page .steps {
+  margin-top: 30px;
+
+  border-top: 1px solid var(--border);
+}
+
+
+
+.docs-page .step {
+  display: grid;
+
+  grid-template-columns: 42px 1fr;
+
+  gap: 18px;
+
+  padding: 20px 0;
+
+  border-bottom: 1px solid var(--border);
+}
+
+
+
+.docs-page .step > span {
+  color: var(--blue);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+
+
+.docs-page .step strong {
+  color: var(--text);
+
+  font-size: 14px;
+}
+
+
+
+.docs-page .step p {
+  margin: 6px 0 0;
+
+  font-size: 14px;
+}
+
+
+
+/* =========================================================
+   VIDEO
+========================================================= */
+
+
+
+.docs-page .video-section {
+  margin: 30px 0;
+}
+
+
+
+.docs-page .video-heading {
+  margin-bottom: 10px;
+}
+
+
+
+.docs-page .video-heading-left {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  color: var(--text);
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+
+.docs-page .video-icon {
+  width: 27px;
+  height: 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--blue-light);
+
+  border: 1px solid var(--border);
+
+  border-radius: 5px;
+
+  color: var(--blue);
+}
+
+
+
+.docs-page .documentation-video {
+  width: 100%;
+
+  display: block;
+
+  background: #111;
+
+  border: 1px solid var(--border);
+
+  border-radius: 6px;
+}
+
+
+
+/* =========================================================
+   WARNING
+========================================================= */
+
+
+
+.docs-page .warning-box {
+  margin-top: 30px;
+
+  padding: 18px 20px;
+
+  background: var(--warning-background);
+
+  border: 1px solid var(--warning-border);
+
+  border-left: 3px solid #b68a35;
+}
+
+
+
+.docs-page .warning-title {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: var(--warning-text);
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+
+.docs-page .warning-box p {
+  margin: 7px 0 0;
+
+  font-size: 14px;
+}
+
+
+
+/* =========================================================
+   TABLES
+========================================================= */
+
+
+
+.docs-page .metric-table,
+.docs-page .error-table {
+  margin-top: 28px;
+
+  overflow: hidden;
+
+  border: 1px solid var(--border);
+
+  border-radius: 6px;
+}
+
+
+
+.docs-page .metric-row,
+.docs-page .error-row {
+  display: grid;
+
+  grid-template-columns:
+    180px
+    1fr;
+
+  padding: 14px 16px;
+
+  border-bottom: 1px solid var(--border);
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+}
+
+
+
+.docs-page .metric-row:last-child,
+.docs-page .error-row:last-child {
+  border-bottom: none;
+}
+
+
+
+.docs-page .metric-header,
+.docs-page .error-header {
+  background: var(--surface);
+
+  color: var(--text);
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.05em;
+}
+
+
+
+.docs-page .error-row {
+  grid-template-columns:
+    1fr
+    1fr;
+}
+
+
+
+.docs-page .error-row code {
+  width: fit-content;
+}
+
+
+
+/* =========================================================
+   API REFERENCE
+========================================================= */
+
+
+
+.docs-page .api-method {
+  padding: 22px 0;
+
+  border-top: 1px solid var(--border);
+}
+
+
+
+.docs-page .method-title {
+  margin-bottom: 9px;
+
+  color: var(--text);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+
+.docs-page .api-method p {
+  margin-bottom: 0;
+}
+
+
+
+/* =========================================================
+   RIGHT SIDEBAR
+========================================================= */
+
+
+
+.docs-page .right-sidebar {
+  position: sticky;
+
+  top: 105px;
+
+  align-self: start;
+
+  padding-top: 46px;
+}
+
+
+
+.docs-page .right-title {
+  margin-bottom: 12px;
+
+  color: var(--text-faint);
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+}
+
+
+
+.docs-page .right-sidebar a,
+.docs-page .right-active {
+  display: block;
+
+  padding: 5px 0;
+
+  color: var(--text-muted);
+
+  font-size: 11px;
+}
+
+
+
+.docs-page .right-sidebar a:hover {
+  color: var(--blue);
+}
+
+
+
+.docs-page .right-active {
+  color: var(--blue);
+
+  font-weight: 600;
+}
+
+
+
+.docs-page .right-divider {
+  width: 1px;
+  height: 12px;
+
+  margin: 6px 0;
+
+  background: var(--border);
+}
+
+
+
+/* =========================================================
+   BOTTOM NAV
+========================================================= */
+
+
+
+.docs-page .docs-bottom-navigation {
+  display: flex;
+
+  justify-content: space-between;
+
+  padding-top: 28px;
+
+  border-top: 1px solid var(--border);
+}
+
+
+
+.docs-page .docs-bottom-navigation button {
+  padding: 10px 0;
+
+  background: transparent;
+
+  border: none;
+
+  color: var(--blue);
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+
+
+.docs-page .docs-footer {
+  border-top: 1px solid var(--border);
+
+  background: var(--surface);
+}
+
+
+
+.docs-page .footer-main {
+  max-width: 1280px;
+
+  margin: 0 auto;
+
+  padding: 90px 40px 100px;
+
+  display: grid;
+
+  grid-template-columns:
+    1.4fr
+    1fr;
+
+  gap: 120px;
+}
+
+
+
+.docs-page .footer-logo {
+  width: 175px;
+
+  display: block;
+}
+
+
+
+.docs-page .footer-intro h2 {
+  margin: 28px 0 14px;
+
+  color: var(--text);
+
+  font-size: 34px;
+
+  line-height: 1.15;
+
+  font-weight: 600;
+
+  letter-spacing: -0.035em;
+}
+
+
+
+.docs-page .footer-intro p {
+  max-width: 450px;
+
+  color: var(--text-muted);
+
+  font-size: 14px;
+
+  line-height: 1.7;
+}
+
+
+
+.docs-page .footer-links {
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap: 60px;
+}
+
+
+
+.docs-page .footer-column {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 13px;
+}
+
+
+
+.docs-page .footer-heading {
+  margin-bottom: 8px;
+
+  color: var(--text-faint);
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+}
+
+
+
+.docs-page .footer-column a {
+  width: fit-content;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+}
+
+
+
+.docs-page .footer-column a:hover {
+  color: var(--blue);
+}
+
+
+
+.docs-page .footer-bottom {
+  max-width: 1280px;
+
+  margin: 0 auto;
+
+  padding: 22px 40px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  border-top: 1px solid var(--border);
+
+  color: var(--text-muted);
+
+  font-size: 11px;
+}
+
+
+
+.docs-page .footer-version {
+  color: var(--blue);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+}
+
+
+
+.docs-page .footer-legal {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+
+
+@media (max-width: 1150px) {
+
+  
+.docs-page .docs-layout {
+    grid-template-columns:
+      220px
+      minmax(0, 1fr);
+
+    gap: 40px;
+  }
+
+
+  
+.docs-page .right-sidebar {
+    display: none;
+  }
+
+
+}
+
+
+
+@media (max-width: 850px) {
+
+  
+.docs-page .docs-header {
+    padding: 7px 20px 0;
+  }
+
+
+  
+.docs-page .header-title,
+.docs-page .header-divider,
+.docs-page .header-link,
+.docs-page .header-github {
+    display: none;
+  }
+
+
+  
+.docs-page .mobile-menu-button {
+    display: flex;
+  }
+
+
+  
+.docs-page .docs-layout {
+    display: block;
+
+    padding: 0 22px;
+  }
+
+
+  
+.docs-page .docs-sidebar {
+    display: none;
+
+    position: fixed;
+
+    left: 0;
+    right: 0;
+    top: 72px;
+
+    z-index: 40;
+
+    width: 100%;
+
+    height: calc(100vh - 72px);
+
+    padding: 24px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid var(--border);
+  }
+
+
+  
+.docs-page .docs-sidebar.mobile-open {
+    display: block;
+  }
+
+
+  
+.docs-page .docs-content {
+    padding-top: 48px;
+  }
+
+
+  
+.docs-page .footer-main {
+    grid-template-columns: 1fr;
+
+    gap: 60px;
+
+    padding: 65px 24px;
+  }
+
+
+  
+.docs-page .footer-bottom {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+    padding: 20px 24px;
+  }
+
+
+}
+
+
+
+@media (max-width: 560px) {
+
+  
+.docs-page .docs-logo {
+    width: 145px;
+  }
+
+
+  
+.docs-page .version-button {
+    min-width: 120px;
+
+    font-size: 11px;
+  }
+
+
+  
+.docs-page .header-icon-button {
+    display: none;
+  }
+
+
+  
+.docs-page .docs-section h1 {
+    font-size: 40px;
+  }
+
+
+  
+.docs-page .docs-section h2 {
+    font-size: 28px;
+  }
+
+
+  
+.docs-page .lead {
+    font-size: 16px !important;
+  }
+
+
+  
+.docs-page .intro-links {
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+
+  
+.docs-page .simple-flow {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+
+  
+.docs-page .simple-flow svg {
+    transform: rotate(90deg);
+  }
+
+
+  
+.docs-page .metric-row,
+.docs-page .error-row {
+    grid-template-columns: 1fr;
+
+    gap: 8px;
+  }
+
+
+  
+.docs-page .docs-code {
+    border-radius: 7px;
+  }
+
+
+  
+.docs-page .code-toolbar {
+    padding-left: 14px;
+  }
+
+
+  
+.docs-page .code-scroll {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+
+  
+.docs-page .code-content {
+    font-size: 12px;
+  }
+
+
+  
+.docs-page .footer-intro h2 {
+    font-size: 28px;
+  }
+
+
+  
+.docs-page .footer-links {
+    grid-template-columns: 1fr;
+
+    gap: 36px;
+  }
+
+
+  
+.docs-page .footer-logo {
+    width: 145px;
+  }
+
+
+}

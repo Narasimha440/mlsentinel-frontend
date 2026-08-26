@@ -11,7 +11,7 @@ interface AlertItem {
     created_at: string;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 const severityConfig = {
     critical: { icon: AlertCircle, color: "text-red-600", bg: "bg-red-50", label: "Critical" },
