@@ -375,23 +375,23 @@ export default function ProjectsPage() {
   // FORMAT DATE
   // ============================================================
 
-  const formatDate = (
-    date: string | null | undefined
-  ) => {
-    if (!date) return "—";
+  // const formatDate = (
+  //   date: string | null | undefined
+  // ) => {
+  //   if (!date) return "—";
 
-    const parsed = new Date(date);
+  //   const parsed = new Date(date);
 
-    if (Number.isNaN(parsed.getTime())) {
-      return "—";
-    }
+  //   if (Number.isNaN(parsed.getTime())) {
+  //     return "—";
+  //   }
 
-    return parsed.toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
+  //   return parsed.toLocaleDateString(undefined, {
+  //     month: "short",
+  //     day: "numeric",
+  //     year: "numeric",
+  //   });
+  // };
 
   // ============================================================
   // FORMAT DATE + TIME

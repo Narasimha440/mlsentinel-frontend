@@ -3,9 +3,6 @@ import { useAuth } from "../context/AuthContext";
 import { Sidebar } from "../components/dashboard/Sidebar";
 import {
   Activity,
-  AlertTriangle,
-  CheckCircle2,
-  AlertCircle,
 } from "lucide-react";
 
 interface RunPoint {
@@ -102,14 +99,14 @@ export default function MonitoringPage() {
     })();
   }, [user]);
 
-  const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString(
-      undefined,
-      {
-        month: "short",
-        day: "numeric",
-      }
-    );
+  // const formatDate = (dateStr: string) =>
+  //   new Date(dateStr).toLocaleDateString(
+  //     undefined,
+  //     {
+  //       month: "short",
+  //       day: "numeric",
+  //     }
+  //   );
 
   const formatFull = (dateStr: string) =>
     new Date(dateStr).toLocaleString(

@@ -21,7 +21,6 @@ gsap.registerPlugin(
   SplitText
 );
 
-const VERSION = "v0.1.8.dev6";
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);

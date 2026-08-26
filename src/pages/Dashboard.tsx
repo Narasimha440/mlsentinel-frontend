@@ -1,11 +1,11 @@
 import { useAuth } from "../context/AuthContext";
 import { signOut } from "firebase/auth";
-import { Sidebar } from "../components/dashboard/Sidebar";
+// import { Sidebar } from "../components/dashboard/Sidebar";
 import { auth } from "../lib/firebase";
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Activity, ArrowUpRight, Bell, ChevronRight, CircleAlert, LogOut, Plus, ShieldCheck } from "lucide-react";
+import { Activity, ArrowUpRight, ChevronRight, CircleAlert, LogOut, Plus, ShieldCheck } from "lucide-react";
 import { SPRING } from "../lib/motion";
 import { AddModelModal } from "../components/dashboard/AddModelModal";
 import { WhatsNewModal } from "../components/dashboard/WhatsNewModal";
